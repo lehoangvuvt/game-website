@@ -1,0 +1,540 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <meta charset="utf-8" />
+    <title>MARIO</title>
+
+    <style>
+
+        body {
+            filter: brightness(0%) grayscale(100%) blur(4px);
+            transition: filter 2s;
+            text-align: center;
+            margin: 0 0 0 0;
+            overflow:hidden;
+            margin-bottom: 0;
+        }
+        #game {
+
+            margin-left:-0.1%;
+            margin-top:1.5%;
+        border:3px solid white;
+        }
+        #level {
+            z-index: 10;
+            position: absolute;
+            left: 35%;
+            height: 10%;
+            top: 5%;
+            font-size: 30px;
+            font-weight: bold;
+            float: left;
+            font-family: 'Press Start 2P', cursive;
+            width: 400px;
+        }
+    </style>
+    <script>
+        setTimeout(function () {
+            document.body.style.filter = "brightness(100%) grayscale(0%) blur(0px)";
+        }, 500);
+    </script>
+</head>
+<body>
+
+    <canvas id="game" width="1536" height="788"></canvas>
+    <div id="level">LEVEL 1-1</div>
+
+    <script>
+        const music = new Audio();
+        music.src = "sound/bg1.mp3";
+        const jumpSound = new Audio();
+        jumpSound.src = "sound/jump.mp3";
+        var isJump = false;
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+
+        let fillBg = () => {
+            ctx.fillStyle = '#5F91FF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        const sprite = new Image();
+        sprite.src = "img/sprite_env.png";
+        const sprite2 = new Image();
+        sprite2.src = "img/sprite_char.png";
+        const sprite3 = new Image();
+        sprite3.src = "img/sprite_char2.png";
+        const pipe = new Image();
+        pipe.src = "img/p2.png";
+        const monster = new Image();
+        monster.src = "img/monster.png";
+
+        var ground = [];
+        var cloud = [];
+        cloud.push({
+            x: 60,
+            y: 100,
+            w: 150,
+            h: 70
+        });
+        cloud.push({
+            x: 400,
+            y: 100,
+            w: 160,
+            h: 80
+        });
+        cloud.push({
+            x: 450,
+            y: 110,
+            w: 190,
+            h: 90
+        });
+        let mario = {
+            sx: 0,
+            sy: 150,
+            sw: 19,
+            sh: 35,
+            x: 65,
+            y: 641,
+            w: 60,
+            h: 100,
+            vy: 0,
+            vx: 0
+        }
+        var pipeObj = [
+            {
+                x: 450,
+                y: canvas.height - 150,
+                w: 150,
+                h: 100
+            }
+        ];
+        var dt = 0;
+        var deltas = null;
+        let gravity = 30;
+        let drawMario = () => {
+            ctx.drawImage(sprite2, mario.sx, mario.sy, mario.sw, mario.sh, mario.x, mario.y, mario.w, mario.h);
+        }
+        let monsterObj = {
+            sx: 0,
+            sy: 0,
+            sw: 120,
+            sh: 120,
+            x: 900,
+            y: canvas.height - 50 - 70,
+            w: 70,
+            h: 70,
+            vx: 0,
+            xy: 0
+        };
+        var countF = 0;
+        let drawMonster = () => {
+            if (monsterObj.x + monsterObj.w >= canvas.width - 200) {
+                monsterObj.vx -= Math.floor(Math.random() * (0, 04 - 0, 02) + 0.02);
+                monster.src = 'img/monster2.png';
+                monsterObj.x += monsterObj.vx;
+                setTimeout(function () { monsterObj.sx = 600; }, 500);
+                setTimeout(function () { monsterObj.sx = 450; }, 1000);
+            } else {
+                monsterObj.vx += Math.floor(Math.random() * (0, 05 - 0, 02) + 0.02);
+                monster.src = 'img/monster.png';
+                monsterObj.x += monsterObj.vx;
+                setTimeout(function () { monsterObj.sx = 450; }, 500);
+                setTimeout(function () { monsterObj.sx = 600; }, 1000);
+            }
+            setTimeout(function () {
+                monsterObj.vy = (Math.floor(Math.random() * (30 - 10)) + 10) * -1;
+                monsterObj.y += monsterObj.vy;
+
+
+            }, 5000);
+
+            monsterObj.y += 40;
+            if (monsterObj.y >= canvas.height - 50 - 70) {
+                monsterObj.y = canvas.height - 50 - 70;
+            }
+
+        }
+
+        let jumpX = 0;
+        let groundLimit = 641;
+        let drawGround = () => {
+            music.play();
+            requestAnimationFrame(drawGround);
+
+            if (++countF < 2) {
+                return;
+            }
+            countF = 0;
+
+            fillBg();
+            ctx.drawImage(sprite, 129, -70, 45, 94, 500, canvas.height - 1250, 700, 1200);
+            ctx.drawImage(sprite, 129, -70, 45, 94, 200, canvas.height - 850, 500, 800);
+
+            ctx.drawImage(monster, monsterObj.sx, monsterObj.sy, monsterObj.sw, monsterObj.sh, monsterObj.x, monsterObj.y, monsterObj.w, monsterObj.h);
+            requestAnimationFrame(drawMonster);
+
+            for (let i = 0; i < pipeObj.length; i++) {
+                ctx.drawImage(pipe, pipeObj[i].x, pipeObj[i].y, pipeObj[i].w, pipeObj[i].h);
+            }
+            function getDeltaTime() {
+                if (isJump) {
+                    deltas = setTimeout(function () {
+                        dt++;
+                        setTimeout(getDeltaTime, 1);
+                    }, 1);
+                }
+            }
+            getDeltaTime();
+            mario.y += gravity * (dt / 50);
+           
+            mario.x += jumpX;
+           
+
+            if (mario.y >= groundLimit) {
+                clearInterval(deltas);
+                dt = 0;
+               
+               jumpX = 0;
+                
+                isJumpRight = false;
+                mario.y = groundLimit;
+
+
+            };
+            drawMario();
+            for (i = 0; i < 35; i++) {
+                ctx.drawImage(sprite, 64, 40, 15, 15, i * 50, canvas.height - 50, 50, 50);
+                ground.push({
+                    x: i * 10,
+                    y: canvas.height - 50,
+                    w: 50,
+                    h: 50
+                });
+            }
+            for (let z = 0; z < cloud.length; z++) {
+                ctx.drawImage(sprite, 210, 113, 40, 30, cloud[z].x, cloud[z].y, cloud[z].w, cloud[z].h);
+                cloud[z].x -= 2;
+                if (cloud[z].x == 10) {
+                    cloud.push(
+                        {
+                            x: canvas.width,
+                            y: Math.floor(Math.random() * (150 - 80)) + 80,
+                            w: Math.floor(Math.random() * (150 - 120)) + 120,
+                            h: Math.floor(Math.random() * (100 - 85)) + 85
+                        }
+                    )
+                }
+
+                if (mario.y + mario.h <= 639 && (mario.x + mario.w / 2 + 5) >= 450 && mario.x <= 500) {
+                    isOn = true;
+                    mario.y = 538;
+                    groundLimit = 538;
+
+                }
+
+                if (mario.x + mario.h - 35 >= 450 && mario.x <= 500 && mario.y >= 638 && groundLimit <= 641) {
+                    mario.x = 450 - mario.h + 30;
+                }
+                if (mario.x > 560 && mario.x < 610 && groundLimit <= 538) {
+                    setTimeout(function () { mario.y = 590; mario.x = 600; }, 1000 / 40);
+                    setTimeout(function () { mario.y = 600; mario.x = 600 + 2; }, 1000 / 30);
+                    setTimeout(function () { mario.y = 610; mario.x = 600 + 5; }, 1000 / 20);
+                    setTimeout(function () { mario.y = 620; mario.x = 600 + 7; }, 1000 / 15);
+                    setTimeout(function () { mario.y = 630; mario.x = 600 + 9; }, 1000 / 10);
+                    setTimeout(function () { mario.y = 641; mario.x = 600 + 11; }, 1000 / 9);
+                    groundLimit = 641;
+                    jumpX = 0;
+                    mario.vy = 0;
+                }
+                if (mario.x + mario.h / 2 < 450 && groundLimit <= 538) {
+                    setTimeout(function () { mario.y = 590; mario.x = 470 - mario.h + 4; }, 1000 / 40);
+                    setTimeout(function () { mario.y = 600; mario.x = 470 - mario.h + 3; }, 1000 / 30);
+                    setTimeout(function () { mario.y = 610; mario.x = 470 - mario.h + 2; }, 1000 / 20);
+                    setTimeout(function () { mario.y = 620; mario.x = 470 - mario.h + 1; }, 1000 / 10);
+                    setTimeout(function () { mario.y = 630; mario.x = 470 - mario.h + 0.5; }, 1000 / 8);
+                    setTimeout(function () { mario.y = 641; mario.x = 470 - mario.h; }, 1000 / 7);
+
+
+                    groundLimit = 641;
+                    jumpX = 0;
+                    mario.vy = 0;
+                }
+                if (mario.x + mario.w - 28 >= monsterObj.x && mario.x <= monsterObj.x + monsterObj.w && mario.y + mario.h >= monsterObj.y + 50) {
+                    alert("YOU DIE.CLICK OK TO TRY AGAIN");
+                    location.reload();
+                }
+                if (mario.x >= canvas.width) {
+                    window.location.href = "mariolv12.html";
+                }
+            }
+        }
+        var isJumpRight = false;
+        var isRight = false;
+        $(document).bind('keydown', function (key) {
+            if (key.which === 39 ) {
+
+                if (mario.y == groundLimit && !isLeft) {
+                  
+                    moveR();
+                }
+            }
+            if (key.which === 37 ) {
+                if (mario.y == groundLimit && !isRight) {
+                    
+                    moveL();
+                }
+            }
+            if (key.which === 32) {
+                isJumpRight = true;
+                if (mario.y === groundLimit && !isJump && isRight) {
+                    jumpR();
+
+                }
+            }
+            if (key.which == 32) {
+
+                if (mario.y === groundLimit && !isJump) {
+                    jumpUp1();
+                }
+
+
+            }
+        });
+        document.addEventListener('keyup', function (key) {
+            if (key.which === 39) {
+                if (mario.y == groundLimit) {
+                      setTimeout(function () { mario.sx = 55; mario.sw = 30; mario.w = 80 }, 1000 / 40);
+                    setTimeout(function () { mario.sx = 115; mario.sw = 30; mario.w = 80 }, 1000 / 20);
+                    setTimeout(function () { mario.sx = 26; mario.sw = 25 }, 1000 / 10);
+                    setTimeout(function () { mario.sx = 0; mario.sw = 19; mario.w = 60, isRight = false; }, 200);
+
+                }
+            }
+            if (key.which === 37) {
+
+                if (mario.y == groundLimit) {
+                    
+                    setTimeout(function () { mario.sx = 330; mario.sw = 29; mario.w = 80 }, 1000 / 40);
+                    setTimeout(function () { mario.sx = 360; mario.sw = 29; mario.w = 80 }, 1000 / 20);;
+                    setTimeout(function () { mario.sx = 330; mario.sw = 29; mario.w = 80 }, 1000 / 10);
+                    setTimeout(function () { mario.sx = 426; mario.sw = 20; mario.w = 63; isLeft = false; }, 200);
+
+
+                }
+            }
+            if (key.which === 32) {
+
+                setTimeout(function () { mario.sx = 0; mario.sw = 19, mario.w = 60, mario.h = 100 }, 1000 / 2.5);
+
+            }
+
+        });
+
+        var isLeft = false;
+    
+        var isBlock = false;
+        var isMove = false;
+        function moveR() {
+            music.play();
+            sprite2.src = 'img/sprite_char.png';
+            isBlock = false;
+            for (let i = 0; i < pipeObj.length; i++) {
+                if (mario.x + mario.w - 10 >= pipeObj[i].x && mario.x + mario.w <= 450 && mario.y > (pipeObj[i].y - pipeObj[i].h)) {
+
+                    isBlock = true;
+                } else {
+                    if (mario.y <= (pipeObj[i].y - pipeObj[i].h)) {
+
+                        isBlock = false;
+                    }
+
+                }
+            }
+            if (!isBlock) {
+                isRight = true;
+                isMove = true;
+                mario.x+= 5.1;
+             
+                setTimeout(function () { mario.sx = 26; mario.sw = 25 }, 1000 / 60);
+                setTimeout(function () { mario.sx = 55; mario.sw = 30; mario.w = 80 }, 1000 / 40);
+                setTimeout(function () { mario.sx = 55; mario.sw = 30; mario.w = 80 }, 1000 / 20);
+                setTimeout(function () { mario.sx = 55; mario.sw = 30; mario.w = 80 }, 1000 / 10);
+                setTimeout(function () { mario.sx = 26; mario.sw = 25; }, 1000 / 5);
+               
+               
+                
+
+                var move = requestAnimationFrame(moveR);
+                cancelAnimationFrame(move);
+            } else {
+
+            }
+        }
+        var isBlock2 = false;
+        function moveL() {
+            music.play();
+            sprite2.src = 'img/sprite_char2.png';
+            isBlock2 = false;
+            for (let i = 0; i < pipeObj.length; i++) {
+                if (mario.x + mario.w - 10 >= pipeObj[i].x && mario.x <= pipeObj[i].x + pipeObj[i].w && mario.y > (pipeObj[i].y - pipeObj[i].h)) {
+
+                    isBlock2 = true;
+                } else {
+                    if (mario.y <= (pipeObj[i].y - pipeObj[i].h)) {
+
+                        isBlock2 = false;
+                    }
+                }
+            }
+            if (!isBlock2) {
+                isLeft = true;
+
+
+                isMove = true;
+                mario.x = mario.x - 5.1;
+
+                setTimeout(function () { mario.sx = 390; mario.sw = 29, mario.w = 80 }, 1000 / 60);
+                setTimeout(function () { mario.sx = 360; mario.sw = 29, mario.w = 80 }, 1000 / 40);
+                setTimeout(function () { mario.sx = 330; mario.sw = 29, mario.w = 80 }, 1000 / 20);
+                setTimeout(function () { mario.sx = 360; mario.sw = 29, mario.w = 80 }, 1000 / 10);
+                setTimeout(function () { mario.sx = 330; mario.sw = 29, mario.w = 80 }, 1000 / 5);
+
+                var move = requestAnimationFrame(moveR);
+                cancelAnimationFrame(move);
+            } else {
+
+            }
+        }
+        var countF3 = 0;
+        function jumpR() {
+            music.play();
+            jumpSound.play();
+            if (groundLimit == 641) {
+                jumpLimit = groundLimit - 91 - 40;
+            } else {
+                jumpLimit = groundLimit - 50;
+            }
+
+
+
+            if (mario.y >= jumpLimit) {
+                jumpX += 5;
+                mario.x = mario.x + 10;
+                mario.vy -= 15;
+                mario.y = mario.y + mario.vy;
+
+                setTimeout(function () { mario.sx = 197; mario.sw = 30, mario.w = 80 }, 1000 / 60);
+                setTimeout(function () { mario.sx = 227; mario.sw = 28, mario.w = 80 }, 1000 / 40);
+                setTimeout(function () { mario.sx = 255; mario.sw = 28, mario.w = 80 }, 1000 / 20);
+                setTimeout(function () { mario.sx = 283; mario.sw = 28, mario.w = 80 }, 1000 / 10);
+                setTimeout(function () { mario.sx = 310; mario.sw = 28, mario.w = 80 }, 1000 / 5);
+                setTimeout(function () { mario.sx = 338; mario.sw = 28, mario.w = 80 }, 1000 / 3);
+                setTimeout(function () { mario.sx = 366; mario.sw = 25, mario.w = 80, mario.h = 103 }, 1000 / 2);
+
+                setTimeout(function () {
+                    isJump = false;
+                    mario.vy = 0;
+                }, 1000);
+                var jr = requestAnimationFrame(jump);
+                if (++countF3 < 4) {
+                    return;
+                }
+                countF3 = 0;
+
+
+
+            }
+        }
+
+
+        var isOn = false;
+        var countF2 = 0
+        var jumpLimit;
+        function jump() {
+            if (groundLimit == 641) {
+                jumpLimit = groundLimit - 91 - 40;
+            } else {
+                jumpLimit = groundLimit - 50;
+            }
+
+
+            isJump = true;
+            if (mario.y >= jumpLimit) {
+
+                mario.y = mario.y - 20;
+                mario.y = mario.y - 20;
+
+                jumpX += 5;
+
+                setTimeout(function () {
+                    isJump = false;
+                }, 1000);
+                requestAnimationFrame(jump);
+                if (++countF2 < 4) {
+                    return;
+                }
+                countF2 = 0;
+
+
+            }
+        }
+
+        function jumpUp1() {
+            music.play();
+            jumpSound.play();
+            isJump = true;
+            if (groundLimit == 641) {
+                jumpLimit = groundLimit - 91 - 20;
+            } else {
+                jumpLimit = groundLimit - 50;
+            }
+
+            if (mario.y >= jumpLimit) {
+
+
+                mario.vy -= 1;
+                mario.y = mario.y + mario.vy;
+                jumpX = 0;
+
+
+                setTimeout(function () {
+                    isJump = false;
+                    mario.vy = 0;
+                }, 1000);
+
+                requestAnimationFrame(jumpUp2);
+
+
+            }
+        }
+
+        function jumpUp2() {
+            if (groundLimit == 641) {
+                jumpLimit = groundLimit - 91 - 20;
+            } else {
+                jumpLimit = groundLimit - 50;
+            }
+
+            isJump = true;
+            if (mario.y >= jumpLimit) {
+
+                mario.vy -= 3;
+                mario.y = mario.y + mario.vy;
+
+                jumpX = 0;
+                setTimeout(function () {
+                    isJump = false;
+                }, 1000);
+                requestAnimationFrame(jumpUp2);
+
+            }
+        }
+
+        window.onload = requestAnimationFrame(drawGround);
+    </script>
+</body>
+
+</html>

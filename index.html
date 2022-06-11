@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Monoton" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <meta charset="utf-8" />
+    <title>GAMES CENTER</title>
+    <style>
+        body {
+            text-align: center;
+            background-image: url('bg1.gif');
+            background-size: 50% 150%;
+         
+            background-position-y:-42%;
+        }
+
+        #title {
+            -webkit-box-shadow: -1px 14px 34px 3px rgba(0,0,0,0.75);
+            -moz-box-shadow: -1px 14px 34px 3px rgba(0,0,0,0.75);
+            box-shadow: -1px 14px 34px 3px rgba(0,0,0,0.75);
+            color: black;
+            margin-left: -0.6%;
+            border-radius: 10px;
+            width: 101.1%;
+            margin-top: -1%;
+            padding-top: 30px;
+            padding-bottom: 20px;
+            background-color: rgba(255,255,255,1);
+            font-size: 70px;
+            font-family: 'Press Start 2P', cursive;
+            letter-spacing: 2px;
+        }
+
+        ul {
+            list-style: none;
+            margin-top: 12%;
+        }
+
+        li {
+            margin-left: 35%;
+            line-height: 70px;
+            text-align: left;
+            display: block;
+        }
+
+            li a {
+                text-transform:uppercase;
+                font-family: 'Press Start 2P', cursive;
+                letter-spacing: 2px;
+                text-decoration: none;
+                font-weight: bold;
+                color: white;
+                font-size: 30px;
+                padding: 10px;
+                padding-top: 12px;
+               
+            }
+
+
+        .current {
+            -webkit-box-shadow: -1px 14px 34px 3px rgba(0,0,0,0.75);
+            -moz-box-shadow: -1px 14px 34px 3px rgba(0,0,0,0.75);
+            box-shadow: -1px 14px 34px 3px rgba(0,0,0,0.75);
+            background-color: white;
+            color: black;
+            letter-spacing: 4px;
+        }
+    </style>
+    <script>
+        var bgImgs = [];
+        var stt = 0;
+        for (i = 0; i < 31; i++) {
+            stt++;
+            var imgSrc = "bg" + stt + ".gif";
+            bgImgs.push({ url: imgSrc });
+        }
+        var count = 2;
+        let changeBg = () => {
+            if (count == 32) {
+                count = 31;
+            }
+            if (count == 1) {
+                document.body.style["background-size"] = "50% 150";
+                document.body.style["background-position-y"] = "-42%";
+
+            }
+            if (count == 2) {
+                document.body.style["background-size"] = "50% 150";
+                document.body.style["background-position-y"] = "-42%";
+
+            }
+            if (count == 3) {
+                document.body.style["background-size"] = "120% 130%";
+                document.body.style["background-position-y"] = "-50%";
+            }
+            if (count == 4) {
+                document.body.style["background-size"] = "120% 128%";
+                document.body.style["background-position-y"] = "-57%";
+            }
+
+
+            var url = "url(" + "'bg" + count + ".gif" + "'" + ")";
+            document.body.style["background-image"] = url;
+
+            count++;
+        }
+        setInterval(changeBg, 10000);
+
+    </script>
+</head>
+<body id="body">
+    <h1 id="title">GAMES CENTER</h1>
+    <ul>
+        <li><a class="current" id="snake" href="pingpong/snake.html">> SNAKE</a></li>
+        <li><a id="pingpong" href="pingpong/pingpong.html">PING PONG</a></li>
+        <li><a id="flappy" href="flappy/flappy.html">FLAPPY BIRD</a></li>
+        <li><a id="mario" href="mario/mariolv11.html">MARIO</a></li>
+    </ul>
+    <script type="text/javascript" src="index.js"></script>
+</body>
+</html>

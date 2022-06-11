@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Baloo+Chettan" rel="stylesheet">
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        #game {
+            border: 3px solid blue;
+           
+
+        }
+
+        body {
+            text-align: center;
+               background-image:url('sea.gif');
+    background-size:25% 75%; 
+           
+        }
+
+        #point {
+            background-color:blue;
+            border-radius:0px 0px 10px 10px;
+            font-family: 'Baloo Chettan', cursive;
+            font-size: 20px;
+            color: white;
+            position: absolute;
+            top: 65%;
+            left: 33.5%;
+            margin-right: 40px;
+            width: 489px;
+            height: 35px;
+            margin-left: 2px;
+            text-align:left;    
+            padding-left:15px;
+            padding-top:10px;
+            padding-bottom:10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="game" width="500" height="500"></canvas>
+    <div id="point">POINTS: 0</div>
+    <script type="text/javascript" src="pong.js"></script>
+</body>
+</html>
